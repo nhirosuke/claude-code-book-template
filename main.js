@@ -104,6 +104,13 @@ function collisionDetection() {
   }
 }
 
+function drawGameOver() {
+  ctx.font = '32px sans-serif';
+  ctx.fillStyle = '#fff';
+  ctx.textAlign = 'center';
+  ctx.fillText('ゲームオーバー', canvas.width / 2, canvas.height / 2);
+}
+
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -123,8 +130,7 @@ function draw() {
     if (ball.x > paddle.x && ball.x < paddle.x + paddle.width) {
       ball.dy = -ball.dy;
     } else if (ball.y + ball.dy > canvas.height - ball.radius) {
-      alert('ゲームオーバー');
-      document.location.reload();
+      drawGameOver();
       return;
     }
   }
