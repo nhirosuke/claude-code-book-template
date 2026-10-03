@@ -51,6 +51,23 @@ document.addEventListener('keyup', (e) => {
   if (e.key === 'ArrowLeft') leftPressed = false;
 });
 
+// タッチ・マウス操作: 指やポインタのX座標にパドルを追従させる
+function movePaddleTo(clientX) {
+  const rect = canvas.getBoundingClientRect();
+  const x = (clientX - rect.left) * (canvas.width / rect.width);
+  paddle.x = Math.max(0, Math.min(canvas.width - paddle.width, x - paddle.width / 2));
+}
+
+canvas.addEventListener('pointerdown', (e) => {
+  canvas.setPointerCapture(e.pointerId);
+  movePaddleTo(e.clientX);
+});
+
+canvas.addEventListener('pointermove', (e) => {
+  if (e.pointerType === 'mouse' && e.buttons === 0) return;
+  movePaddleTo(e.clientX);
+});
+
 function drawBall() {
   ctx.beginPath();
   ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);

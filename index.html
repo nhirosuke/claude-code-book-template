@@ -2,9 +2,13 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 <title>ブロック崩し</title>
 <style>
   body {
+    margin: 0;
+    padding: 0 8px;
+    overscroll-behavior: none;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -16,6 +20,11 @@
     background: #000;
     border: 2px solid #fff;
     margin-top: 20px;
+    width: 100%;
+    max-width: 480px;
+    height: auto;
+    box-sizing: border-box;
+    touch-action: none;
   }
   #info {
     margin-top: 10px;
