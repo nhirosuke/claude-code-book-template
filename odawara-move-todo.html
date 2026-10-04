@@ -1,0 +1,331 @@
+<title>小田原引っ越しTODO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Zen+Maru+Gothic:wght@700&display=swap">
+<style>
+/* Layout: 1-column phone-first list. Summary strip on top, filters, then due-date groups of expandable rows. */
+:root{
+  --bg:#f2f5f6; --surface:#ffffff; --surface2:#e9eff1; --ink:#13232b; --muted:#5b6f78; --line:#d5dfe3;
+  --accent:#0d6b7a; --accent-ink:#ffffff; --accent-soft:#d9eef1;
+  --a:#2a5ba8; --a-soft:#dfe9f8; --b:#a8426b; --b-soft:#f7e1ea; --both:#4d5f69; --both-soft:#e4eaed;
+  --ok:#1f7a4a; --ok-soft:#dcf1e5; --warn:#8a5a00; --warn-soft:#fbeccc; --bad:#b3261e; --bad-soft:#fbe0dd;
+  --font:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",system-ui,sans-serif;
+  --display:"Zen Maru Gothic","Zen Kaku Gothic New","Hiragino Maru Gothic ProN",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1a20; --surface:#17262e; --surface2:#1f323c; --ink:#e6eef1; --muted:#97aab3; --line:#2b414c;
+  --accent:#4fc0d1; --accent-ink:#06222a; --accent-soft:#17383f;
+  --a:#8db4ee; --a-soft:#1d3050; --b:#ef9bb9; --b-soft:#4a2335; --both:#a9bcc5; --both-soft:#26363e;
+  --ok:#68d09a; --ok-soft:#173a29; --warn:#f0c15f; --warn-soft:#41330f; --bad:#ff8f86; --bad-soft:#4a1e1b;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1a20; --surface:#17262e; --surface2:#1f323c; --ink:#e6eef1; --muted:#97aab3; --line:#2b414c;
+  --accent:#4fc0d1; --accent-ink:#06222a; --accent-soft:#17383f;
+  --a:#8db4ee; --a-soft:#1d3050; --b:#ef9bb9; --b-soft:#4a2335; --both:#a9bcc5; --both-soft:#26363e;
+  --ok:#68d09a; --ok-soft:#173a29; --warn:#f0c15f; --warn-soft:#41330f; --bad:#ff8f86; --bad-soft:#4a1e1b;
+  color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.6}
+.wrap{max-width:760px;margin:0 auto;padding-inline:16px;padding-block:20px 80px}
+header{display:flex;flex-wrap:wrap;gap:12px 16px;align-items:flex-end;justify-content:space-between;margin-bottom:16px}
+h1{font-family:var(--display);font-size:24px;line-height:1.25;margin:0;text-wrap:balance}
+.route{color:var(--muted);font-size:13px;margin:2px 0 0}
+.count{text-align:right}
+.count b{font-family:var(--display);font-size:34px;line-height:1;font-variant-numeric:tabular-nums;color:var(--accent)}
+.count span{font-size:13px;color:var(--muted)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 12px;min-height:36px}
+.btn:hover{background:var(--surface2)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:700}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.danger{color:var(--bad);border-color:var(--bad)}
+.btn.small{min-height:30px;padding:3px 10px;font-size:13px}
+.summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:12px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-width:0}
+.stat small{display:block;color:var(--muted);font-size:12px}
+.stat b{font-size:22px;font-variant-numeric:tabular-nums}
+.stat.bad b{color:var(--bad)}
+.bar{height:6px;background:var(--surface2);border-radius:99px;overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;background:var(--ok);width:0}
+.tools{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;align-items:center}
+.seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;background:transparent;padding:6px 12px;min-height:36px;border-right:1px solid var(--line)}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);font-weight:700}
+select,input[type=text],input[type=date],textarea{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 10px;min-height:36px;max-width:100%}
+textarea{width:100%;resize:vertical;min-height:64px}
+.grp h2{font-size:13px;letter-spacing:.06em;color:var(--muted);margin:20px 0 8px;display:flex;gap:8px;align-items:center}
+.grp h2 em{font-style:normal;background:var(--surface2);border-radius:99px;padding:0 8px;font-variant-numeric:tabular-nums}
+.grp.over h2{color:var(--bad)}
+.item{background:var(--surface);border:1px solid var(--line);border-radius:10px;margin-bottom:6px;overflow:hidden}
+.item.over{border-color:var(--bad)}
+.row{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;padding:10px 12px;align-items:start}
+.chk{width:22px;height:22px;margin-top:2px;accent-color:var(--ok);cursor:pointer}
+.main{min-width:0;text-align:left;background:none;border:0;padding:0;width:100%}
+.title{display:block;font-weight:500;overflow-wrap:anywhere}
+.item.done .title{text-decoration:line-through;color:var(--muted)}
+.meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.chip{font-size:12px;border-radius:99px;padding:1px 9px;background:var(--surface2);color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.chip.a{background:var(--a-soft);color:var(--a)}
+.chip.b{background:var(--b-soft);color:var(--b)}
+.chip.both{background:var(--both-soft);color:var(--both)}
+.chip.bad{background:var(--bad-soft);color:var(--bad);font-weight:700}
+.chip.warn{background:var(--warn-soft);color:var(--warn)}
+.chip.ok{background:var(--ok-soft);color:var(--ok)}
+.chip.pri{background:var(--accent);color:var(--accent-ink);font-weight:700}
+.detail{border-top:1px solid var(--line);padding:12px 12px 14px 44px;display:grid;gap:12px;background:var(--bg)}
+.edit{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.edit label{font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:2px}
+.research{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px;display:grid;gap:8px;font-size:14px}
+.research h3{margin:0;font-size:12px;color:var(--accent);letter-spacing:.06em}
+.research p{margin:0}
+.research ol,.research ul{margin:0;padding-left:20px;display:grid;gap:2px}
+.research dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:2px 10px}
+.research dt{color:var(--muted)}
+.research dd{margin:0}
+.caution{background:var(--warn-soft);color:var(--warn);border-radius:6px;padding:6px 10px}
+.pending{color:var(--muted);font-size:13px;border:1px dashed var(--line);border-radius:8px;padding:10px 12px}
+.add{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px;margin-top:24px;display:grid;gap:10px}
+.add h2{margin:0;font-size:15px}
+.add .edit input[type=text]{flex:1 1 220px}
+.empty{text-align:center;color:var(--muted);padding:40px 16px;border:1px dashed var(--line);border-radius:10px}
+.settings{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:12px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:8px;font-size:14px;z-index:5;max-width:calc(100% - 32px)}
+a{color:var(--accent)}
+@media (max-width:480px){.detail{padding-left:12px}.summary{gap:6px}.stat{padding:8px 10px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>小田原引っ越しTODO</h1>
+      <p class="route">宝塚 → 小田原 / 夫婦で共有</p>
+    </div>
+    <div class="count" id="count"></div>
+  </header>
+
+  <div id="settings" class="settings" hidden></div>
+  <div class="summary" id="summary"></div>
+
+  <div class="tools">
+    <div class="seg" id="whoSeg" role="group" aria-label="担当で絞り込み"></div>
+    <select id="catSel" aria-label="カテゴリで絞り込み"></select>
+    <div class="seg" id="viewSeg" role="group" aria-label="表示切替">
+      <button type="button" data-v="open" aria-pressed="true">未完了</button>
+      <button type="button" data-v="all" aria-pressed="false">すべて</button>
+    </div>
+    <button class="btn small" id="settingsBtn" type="button">設定</button>
+  </div>
+
+  <div id="list"></div>
+
+  <form class="add" id="addForm" autocomplete="off">
+    <h2>TODOを追加</h2>
+    <div class="edit">
+      <input type="text" id="addTitle" placeholder="やること" required aria-label="やること">
+    </div>
+    <div class="edit">
+      <label>カテゴリ<select id="addCat"></select></label>
+      <label>担当<select id="addWho"></select></label>
+      <label>期限<input type="date" id="addDue"></label>
+      <button class="btn primary" type="submit" style="align-self:flex-end">追加</button>
+    </div>
+  </form>
+</div>
+<div id="toast" class="toast" hidden></div>
+
+<script>
+(function(){
+  var CATS=['ローン・売却','購入(小田原)','役所','子ども','ペット','車・バイク','ライフライン','引っ越し作業','住所変更・その他'];
+  var state={todos:[],settings:{moveDate:'2027-03-20',moveDateTentative:true,nameA:'夫',nameB:'妻'},who:'all',cat:'all',view:'open',open:{},ready:false,editingSettings:false};
+  var db=null, todosCol=null, settingsDoc=null, queue={}, pendingRender=false;
+
+  function $(id){return document.getElementById(id)}
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+  function toast(msg){var t=$('toast');t.textContent=msg;t.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(function(){t.hidden=true},2600)}
+
+  /* dates: UTC-midnight day numbers so timezones never shift a deadline */
+  function parse(s){var p=String(s).split('-');return Date.UTC(+p[0],+p[1]-1,+p[2])/86400000}
+  function fmt(d){var x=new Date(d*86400000);return x.getUTCFullYear()+'-'+String(x.getUTCMonth()+1).padStart(2,'0')+'-'+String(x.getUTCDate()).padStart(2,'0')}
+  function jp(d){var x=new Date(d*86400000);var w='日月火水木金土'[x.getUTCDay()];return (x.getUTCMonth()+1)+'/'+x.getUTCDate()+'('+w+')'}
+  function today(){var n=new Date();return Date.UTC(n.getFullYear(),n.getMonth(),n.getDate())/86400000}
+  function dueOf(t){if(t.due)return parse(t.due);return parse(state.settings.moveDate)+(t.offset||0)}
+  function whoName(w){return w==='a'?state.settings.nameA:w==='b'?state.settings.nameB:'両方'}
+
+  /* serialized writes per document */
+  function write(path,fn){
+    var prev=queue[path]||Promise.resolve();
+    var next=prev.then(fn).catch(function(e){toast('保存できませんでした。編集権限があるか確認してください。');console.error(e)});
+    queue[path]=next;return next;
+  }
+  function updTodo(id,patch){return write('todos/'+id,function(){return todosCol.doc(id).update(patch)})}
+
+  function visible(){
+    return state.todos.filter(function(t){
+      if(state.view==='open'&&t.status==='done')return false;
+      if(state.who==='a'&&t.who==='b')return false;
+      if(state.who==='b'&&t.who==='a')return false;
+      if(state.who==='both'&&t.who!=='both')return false;
+      if(state.cat!=='all'&&t.cat!==state.cat)return false;
+      return true;
+    });
+  }
+
+  function chipWho(w){return '<span class="chip '+w+'">'+esc(whoName(w))+'</span>'}
+
+  function renderItem(t,td){
+    var d=dueOf(t), done=t.status==='done', over=!done&&d<td;
+    var left=d-td;
+    var dueChip='<span class="chip '+(over?'bad':(!done&&left<=7?'warn':''))+'">'+jp(d)+(over?'・'+(-left)+'日超過':(!done&&left>=0&&left<=7?'・あと'+left+'日':''))+'</span>';
+    var r=t.research;
+    var chips=dueChip+chipWho(t.who)+'<span class="chip">'+esc(t.cat)+'</span>'
+      +(t.priority&&!done?'<span class="chip pri">優先</span>':'')
+      +(t.status==='doing'?'<span class="chip warn">進行中</span>':'')
+      +(r?'<span class="chip ok">下調べ済</span>':'');
+    var h='<div class="item'+(done?' done':'')+(over?' over':'')+'" data-id="'+esc(t.id)+'">'
+      +'<div class="row"><input type="checkbox" class="chk" data-act="toggle" aria-label="完了にする"'+(done?' checked':'')+'>'
+      +'<button type="button" class="main" data-act="open" aria-expanded="'+(!!state.open[t.id])+'"><span class="title">'+esc(t.title)+'</span><span class="meta">'+chips+'</span></button></div>';
+    if(state.open[t.id]){
+      h+='<div class="detail"><div class="edit">'
+        +'<label>担当<select data-act="who">'+['a','b','both'].map(function(w){return '<option value="'+w+'"'+(t.who===w?' selected':'')+'>'+esc(whoName(w))+'</option>'}).join('')+'</select></label>'
+        +'<label>期限<input type="date" data-act="due" value="'+fmt(d)+'"></label>'
+        +'<label>状態<select data-act="status">'+[['todo','未着手'],['doing','進行中'],['done','完了']].map(function(s){return '<option value="'+s[0]+'"'+(t.status===s[0]?' selected':'')+'>'+s[1]+'</option>'}).join('')+'</select></label>'
+        +(t.due&&t.offset!=null?'<button type="button" class="btn small" data-act="unfix" style="align-self:flex-end">引っ越し日に連動</button>':'')
+        +'</div>';
+      if(r){
+        h+='<div class="research"><h3>下調べ('+esc(r.checkedAt||'')+')</h3>';
+        if(r.summary)h+='<p>'+esc(r.summary)+'</p>';
+        if(r.steps&&r.steps.length)h+='<ol>'+r.steps.map(function(s){return '<li>'+esc(s)+'</li>'}).join('')+'</ol>';
+        if(r.docs&&r.docs.length||r.cost){h+='<dl>';
+          if(r.docs&&r.docs.length)h+='<dt>必要書類</dt><dd>'+r.docs.map(esc).join('、')+'</dd>';
+          if(r.cost)h+='<dt>費用</dt><dd>'+esc(r.cost)+'</dd>';
+          h+='</dl>';}
+        if(r.caution)h+='<p class="caution">要確認: '+esc(r.caution)+'</p>';
+        if(r.links&&r.links.length)h+='<p>'+r.links.map(function(l){return '<a href="'+esc(l.u)+'" target="_blank" rel="noopener">'+esc(l.t)+'</a>'}).join(' / ')+'</p>';
+        h+='</div>';
+      }else{
+        h+='<div class="pending">下調べはまだありません。Claudeに「この項目を調べて」と伝えると、ここに手順・必要書類・費用が入ります。</div>';
+      }
+      h+='<label style="font-size:12px;color:var(--muted)">メモ(夫婦で共有)<textarea data-act="note" placeholder="進捗や連絡先など">'+esc(t.note||'')+'</textarea></label>'
+        +'<div class="edit"><button type="button" class="btn small danger" data-act="del">'+(state.confirmDel===t.id?'本当に削除する':'削除')+'</button></div></div>';
+    }
+    return h+'</div>';
+  }
+
+  function render(){
+    if(!state.ready){return}
+    var ae=document.activeElement;
+    if(ae&&$('list').contains(ae)&&/^(TEXTAREA|INPUT)$/.test(ae.tagName)&&ae.type!=='checkbox'){pendingRender=true;return}
+    pendingRender=false;
+    var td=today(), all=state.todos, mv=parse(state.settings.moveDate);
+    var days=mv-td;
+    $('count').innerHTML=days>=0?'<span>引っ越しまで</span><br><b>'+days+'</b><span> 日</span><br><span>'+jp(mv)+' '+esc(state.settings.moveDate.slice(0,4))+(state.settings.moveDateTentative?'(仮)':'')+'</span>'
+      :'<span>引っ越しから</span><br><b>'+(-days)+'</b><span> 日</span>';
+    var done=all.filter(function(t){return t.status==='done'}).length;
+    var overN=all.filter(function(t){return t.status!=='done'&&dueOf(t)<td}).length;
+    var weekN=all.filter(function(t){var d=dueOf(t);return t.status!=='done'&&d>=td&&d<=td+7}).length;
+    $('summary').innerHTML='<div class="stat"><small>完了</small><b>'+done+'</b><small> / '+all.length+'</small><div class="bar"><i style="width:'+(all.length?Math.round(done/all.length*100):0)+'%"></i></div></div>'
+      +'<div class="stat '+(overN?'bad':'')+'"><small>期限超過</small><b>'+overN+'</b><small> 件</small></div>'
+      +'<div class="stat"><small>7日以内</small><b>'+weekN+'</b><small> 件</small></div>';
+
+    var whoBtns=[['all','全員'],['a',state.settings.nameA],['b',state.settings.nameB],['both','両方']];
+    $('whoSeg').innerHTML=whoBtns.map(function(b){return '<button type="button" data-w="'+b[0]+'" aria-pressed="'+(state.who===b[0])+'">'+esc(b[1])+'</button>'}).join('');
+    var catSel=$('catSel'), cv=state.cat;
+    catSel.innerHTML='<option value="all">すべてのカテゴリ</option>'+CATS.map(function(c){return '<option value="'+esc(c)+'"'+(cv===c?' selected':'')+'>'+esc(c)+'</option>'}).join('');
+    Array.prototype.forEach.call($('viewSeg').children,function(b){b.setAttribute('aria-pressed',String(b.getAttribute('data-v')===state.view))});
+    var aw=$('addWho'), av=aw.value||'both';
+    aw.innerHTML=['a','b','both'].map(function(w){return '<option value="'+w+'"'+(av===w?' selected':'')+'>'+esc(whoName(w))+'</option>'}).join('');
+
+    var vis=visible().slice().sort(function(a,b){return dueOf(a)-dueOf(b)||(a.order||0)-(b.order||0)});
+    if(!all.length){$('list').innerHTML='<div class="empty">TODOがまだありません。下のフォームから追加できます。</div>';return}
+    if(!vis.length){$('list').innerHTML='<div class="empty">この条件に合うTODOはありません。</div>';return}
+    var groups=[['over','期限超過',[]],['w','7日以内',[]],['m','30日以内',[]],['l','それ以降',[]],['d','完了',[]]];
+    vis.forEach(function(t){
+      var d=dueOf(t);
+      if(t.status==='done')groups[4][2].push(t);
+      else if(d<td)groups[0][2].push(t);
+      else if(d<=td+7)groups[1][2].push(t);
+      else if(d<=td+30)groups[2][2].push(t);
+      else groups[3][2].push(t);
+    });
+    $('list').innerHTML=groups.filter(function(g){return g[2].length}).map(function(g){
+      return '<section class="grp '+(g[0]==='over'?'over':'')+'"><h2>'+g[1]+'<em>'+g[2].length+'</em></h2>'+g[2].map(function(t){return renderItem(t,td)}).join('')+'</section>';
+    }).join('');
+  }
+
+  function renderSettings(){
+    var s=state.settings, el=$('settings');
+    el.hidden=!state.editingSettings;
+    if(!state.editingSettings)return;
+    el.innerHTML='<div class="edit"><label>引っ越し日<input type="date" id="sMove" value="'+esc(s.moveDate)+'"></label>'
+      +'<label>確定?<select id="sTent"><option value="1"'+(s.moveDateTentative?' selected':'')+'>仮</option><option value="0"'+(!s.moveDateTentative?' selected':'')+'>確定</option></select></label>'
+      +'<label>1人目の呼び名<input type="text" id="sA" value="'+esc(s.nameA)+'" size="8"></label>'
+      +'<label>2人目の呼び名<input type="text" id="sB" value="'+esc(s.nameB)+'" size="8"></label>'
+      +'<button type="button" class="btn primary" id="sSave" style="align-self:flex-end">保存</button></div>'
+      +'<p class="route" style="margin-top:8px">引っ越し日を変えると、日付を固定していないTODOの期限が連動して動きます。</p>';
+  }
+
+  /* events */
+  $('list').addEventListener('click',function(e){
+    var item=e.target.closest('.item'); if(!item)return;
+    var id=item.getAttribute('data-id'), act=e.target.closest('[data-act]');
+    if(!act)return; var a=act.getAttribute('data-act');
+    if(a==='open'){state.open[id]=!state.open[id];state.confirmDel=null;render()}
+    else if(a==='unfix'){updTodo(id,{due:null})}
+    else if(a==='del'){
+      if(state.confirmDel===id){state.confirmDel=null;write('todos/'+id,function(){return todosCol.doc(id).delete()})}
+      else{state.confirmDel=id;render()}
+    }
+  });
+  $('list').addEventListener('change',function(e){
+    var item=e.target.closest('.item'); if(!item)return;
+    var id=item.getAttribute('data-id'), a=e.target.getAttribute('data-act'), v=e.target.value;
+    if(a==='toggle')updTodo(id,{status:e.target.checked?'done':'todo'});
+    else if(a==='who')updTodo(id,{who:v});
+    else if(a==='status')updTodo(id,{status:v});
+    else if(a==='due'){if(v)updTodo(id,{due:v})}
+    else if(a==='note')updTodo(id,{note:v});
+  });
+  $('list').addEventListener('focusout',function(){setTimeout(function(){if(pendingRender)render()},50)});
+  $('whoSeg').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;state.who=b.getAttribute('data-w');render()});
+  $('viewSeg').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;state.view=b.getAttribute('data-v');render()});
+  $('catSel').addEventListener('change',function(e){state.cat=e.target.value;render()});
+  $('settingsBtn').addEventListener('click',function(){state.editingSettings=!state.editingSettings;renderSettings()});
+  $('settings').addEventListener('click',function(e){
+    if(e.target.id!=='sSave')return;
+    var m=$('sMove').value; if(!m){toast('引っ越し日を入力してください');return}
+    var s={moveDate:m,moveDateTentative:$('sTent').value==='1',nameA:$('sA').value.trim()||'夫',nameB:$('sB').value.trim()||'妻'};
+    write('settings/main',function(){return settingsDoc.set(s)}).then(function(){state.editingSettings=false;renderSettings();toast('保存しました')});
+  });
+  $('addForm').addEventListener('submit',function(e){
+    e.preventDefault();
+    var title=$('addTitle').value.trim(); if(!title)return;
+    var due=$('addDue').value||null;
+    var max=state.todos.reduce(function(m,t){return Math.max(m,t.order||0)},0);
+    var data={title:title,cat:$('addCat').value,who:$('addWho').value,offset:due?null:-30,due:due,priority:false,status:'todo',note:'',research:null,order:max+1};
+    write('todos/new',function(){return todosCol.add(data)}).then(function(){$('addTitle').value='';$('addDue').value='';toast('追加しました')});
+  });
+  $('addCat').innerHTML=CATS.map(function(c){return '<option>'+esc(c)+'</option>'}).join('');
+
+  /* boot */
+  function boot(){
+    if(!window.claude||!claude.use){$('list').innerHTML='<div class="empty">共有データを読み込めません。claude.aiで開き直してください。</div>';return}
+    claude.use('db').then(function(d){
+      if(!d){$('list').innerHTML='<div class="empty">共有データを読み込めません。サインインしてから開き直してください。</div>';return}
+      db=d; todosCol=db.collection('todos'); settingsDoc=db.doc('settings/main');
+      settingsDoc.onSnapshot(function(snap){
+        if(snap.exists){var s=snap.data();state.settings={moveDate:s.moveDate||'2027-03-20',moveDateTentative:!!s.moveDateTentative,nameA:s.nameA||'夫',nameB:s.nameB||'妻'}}
+        state.ready=true; render(); renderSettings();
+      },function(){});
+      todosCol.onSnapshot(function(snap){
+        state.todos=snap.docs.map(function(d){var o=Object.assign({},d.data());o.id=d.id;return o});
+        state.ready=true; render();
+      },function(e){$('list').innerHTML='<div class="empty">読み込みに失敗しました。ページを開き直してください。</div>'});
+    });
+  }
+  boot();
+})();
+</script>
