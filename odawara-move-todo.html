@@ -233,7 +233,7 @@ a{color:var(--accent)}
   var CERR={not_granted:'Claudeの利用が許可されていません。許可のダイアログで許可すると使えます。',sampling_disabled:'このアカウントではClaudeへの質問を使えません。「調べてもらう」で依頼してください。',rate_limited:'回数の上限に達しました。しばらくしてからもう一度お試しください。',session_expired:'ログインの有効期限が切れました。開き直してください。',prompt_too_large:'入力が長すぎます。会話をリセットしてください。',refused:'この内容には回答できませんでした。言い方を変えてください。',empty_completion:'回答が空でした。質問を具体的にしてください。'};
   var CAND_URL='https://claude.ai/artifact/VSQdFTNpEVcdzdH4R8tweU';
   var DOCRULES=[[/本人確認/,'本人確認書類'],[/マイナンバー/,'マイナンバーカード'],[/印鑑登録証|印鑑証明/,'印鑑登録証明書'],[/実印|^印鑑|印鑑$/,'印鑑(実印)'],[/住民票/,'住民票の写し'],[/源泉徴収票|確定申告書/,'源泉徴収票(収入が分かる書類)'],[/売買契約書/,'売買契約書(写し)'],[/登記事項証明書/,'登記事項証明書'],[/車検証/,'車検証'],[/健康保険証|資格確認|保険証/,'健康保険証(資格確認書類)'],[/母子手帳|母子健康手帳/,'母子健康手帳'],[/就労証明/,'就労証明書'],[/通帳|キャッシュカード|口座|振込先/,'振込先の口座情報'],[/転出証明書/,'転出証明書'],[/ローン残高|残高証明/,'ローン残高証明書'],[/固定資産税納税通知書/,'固定資産税納税通知書']];
-  var state={todos:[],requests:[],visits:[],docsDone:{},settings:{moveDate:'2027-03-20',moveDateTentative:true,settleDate:null,saleDate:null,nameA:'夫',nameB:'妻'},
+  var state={todos:[],requests:[],visits:[],docsDone:{},settings:{moveDate:'2027-03-20',moveDateTentative:true,settleDate:null,saleDate:null,childBirth:'',nameA:'夫',nameB:'妻'},
     tab:'todo',who:'all',cat:'all',view:'open',open:{},ready:false,editingSettings:false,
     me:{id:null,name:''},names:{},chats:{},drafts:{},gopen:false,confirmDel:null,vfilter:'all',vconfirm:null,vnew:{kind:'物件',title:'',org:'',date:'',time:''}};
   var db=null, todosCol=null, reqCol=null, visitCol=null, settingsDoc=null, docsDoc=null, sample=null, downloads=null, userCap=null, queue={}, pendingRender=false, nameKey='';
@@ -387,7 +387,7 @@ a{color:var(--accent)}
   }
   function contextFor(key){
     var s=state.settings;
-    var base='あなたは、夫婦の引っ越しTODOを手伝うアシスタントです。前提: 兵庫県宝塚市の持ち家を売却し、神奈川県小田原市(酒匂1丁目周辺などが候補)の持ち家を購入する県外転居。りそな銀行の住みかえプラン(先行購入、旧居の売却に約1年の猶予を予定)。引っ越し予定日は'+s.moveDate+(s.moveDateTentative?'(仮)':'')+'、新居の決済日は'+fmt(anchorDate('settle'))+'ごろ。夫婦とも在宅勤務で、3歳の子どもが1人。車・バイクあり。ペットはいない。夫婦2人で使う。\n'
+    var base='あなたは、夫婦の引っ越しTODOを手伝うアシスタントです。前提: 兵庫県宝塚市の持ち家を売却し、神奈川県小田原市(酒匂1丁目周辺などが候補)の持ち家を購入する県外転居。りそな銀行の住みかえプラン(先行購入、旧居の売却に約1年の猶予を予定)。引っ越し予定日は'+s.moveDate+(s.moveDateTentative?'(仮)':'')+'、新居の決済日は'+fmt(anchorDate('settle'))+'ごろ。夫婦とも在宅勤務で、子どもが1人'+(s.childBirth?'(生年月日'+s.childBirth+')':'(3歳)')+'。車・バイクあり。ペットはいない。夫婦2人で使う。\n'
       +'ルール: 日本語で、短く具体的に答える。あなたはWebを検索できないので、制度・期限・金額は断定せず、確認先(公式サイトや窓口)を示す。調査が必要な内容は、画面の「調べてもらう(依頼)」を使うよう案内する。\n';
     if(key==='g'){
       var td=today();
@@ -707,7 +707,8 @@ a{color:var(--accent)}
     el.innerHTML='<div class="edit"><label>引っ越し日<input type="date" id="sMove" value="'+esc(s.moveDate)+'"></label>'
       +'<label>確定?<select id="sTent"><option value="1"'+(s.moveDateTentative?' selected':'')+'>仮</option><option value="0"'+(!s.moveDateTentative?' selected':'')+'>確定</option></select></label>'
       +'<label>新居の決済日(空欄=引っ越し日の30日前)<input type="date" id="sSettle" value="'+esc(s.settleDate||'')+'"></label>'
-      +'<label>旧居の売却完了日(空欄=引っ越し日の330日後)<input type="date" id="sSale" value="'+esc(s.saleDate||'')+'"></label></div>'
+      +'<label>旧居の売却完了日(空欄=引っ越し日の330日後)<input type="date" id="sSale" value="'+esc(s.saleDate||'')+'"></label>'
+      +'<label>お子さんの生年月日(任意)<input type="date" id="sChild" value="'+esc(s.childBirth||'')+'"></label></div>'
       +'<div class="edit" style="margin-top:8px"><label>1人目の呼び名<input type="text" id="sA" value="'+esc(s.nameA)+'" size="8"></label>'
       +'<label>2人目の呼び名<input type="text" id="sB" value="'+esc(s.nameB)+'" size="8"></label>'
       +'<button type="button" class="btn primary" id="sSave" style="align-self:flex-end">保存</button></div>'
@@ -852,7 +853,7 @@ a{color:var(--accent)}
   $('settings').addEventListener('click',function(e){
     if(e.target.id!=='sSave')return;
     var m=$('sMove').value; if(!m){toast('引っ越し日を入力してください');return}
-    var s={moveDate:m,moveDateTentative:$('sTent').value==='1',settleDate:$('sSettle').value||null,saleDate:$('sSale').value||null,nameA:$('sA').value.trim()||'夫',nameB:$('sB').value.trim()||'妻'};
+    var s={moveDate:m,moveDateTentative:$('sTent').value==='1',settleDate:$('sSettle').value||null,saleDate:$('sSale').value||null,childBirth:$('sChild').value||'',nameA:$('sA').value.trim()||'夫',nameB:$('sB').value.trim()||'妻'};
     write('settings/main',function(){return settingsDoc.set(s)}).then(function(){state.editingSettings=false;renderSettings();toast('保存しました')});
   });
   $('addForm').addEventListener('submit',function(e){
@@ -893,7 +894,7 @@ a{color:var(--accent)}
       if(!d){$('list').innerHTML='<div class="empty">共有データを読み込めません。サインインしてから開き直してください。</div>';return}
       db=d; todosCol=db.collection('todos'); reqCol=db.collection('requests'); visitCol=db.collection('visits'); settingsDoc=db.doc('settings/main'); docsDoc=db.doc('settings/docs');
       settingsDoc.onSnapshot(function(snap){
-        if(snap.exists){var s=snap.data();state.settings={moveDate:s.moveDate||'2027-03-20',moveDateTentative:!!s.moveDateTentative,settleDate:s.settleDate||null,saleDate:s.saleDate||null,nameA:s.nameA||'夫',nameB:s.nameB||'妻'}}
+        if(snap.exists){var s=snap.data();state.settings={moveDate:s.moveDate||'2027-03-20',moveDateTentative:!!s.moveDateTentative,settleDate:s.settleDate||null,saleDate:s.saleDate||null,childBirth:s.childBirth||'',nameA:s.nameA||'夫',nameB:s.nameB||'妻'}}
         state.ready=true; render(); renderSettings();
       },function(){});
       docsDoc.onSnapshot(function(snap){state.docsDone=snap.exists?snap.data():{};render()},function(){});
